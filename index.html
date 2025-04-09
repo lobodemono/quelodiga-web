@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueLoDiga.com</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" href="icons/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="QueLoDiga">
+    
+    <!-- Android Chrome -->
+    <link rel="manifest" href="icons/manifest.json">
+    <meta name="theme-color" content="#e91e63">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Toast notification for clipboard detection -->
+        <div id="clipboardToast" class="clipboard-toast hidden">
+            <div class="clipboard-toast-message">¿Responder al texto: <span id="clipboardPreview"></span>?</div>
+            <div class="clipboard-toast-buttons">
+                <button id="acceptClipboard" class="clipboard-toast-button accept">Sí</button>
+                <button id="rejectClipboard" class="clipboard-toast-button reject">No</button>
+            </div>
+        </div>
+        
+        
+        
+        <header>
+            <h1><img src="archivo-para-icono.png" alt="Logo" class="header-icon">QueLoDiga.com</h1>
+        </header>
+        
+        <div class="collapsible-container">
+            <button type="button" class="collapsible-trigger">(Opcional) Responder a un mensaje... <i class="fas fa-chevron-down"></i></button>
+            <div class="collapsible-content">
+                <div class="relationship-container">
+                    <label for="relationshipInput">Estoy respondiendo a mi:</label>
+                    <input type="text" id="relationshipInput" placeholder="Pareja / mamá / jefe / compadre / ...">
+                </div>
+                
+                <div class="original-message-container">
+                    <label for="originalMessage">Que me dijo:</label>
+                    <textarea id="originalMessage" placeholder="Pega aquí el mensaje al cual quieres responder..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <main>
+            <h2>¿Qué quieres decir pero no sabes cómo? 🤔</h2>
+            
+            <div class="input-container">
+                <textarea id="userInput" placeholder="Tu mensaje sin filtros aquí (como se te ocurra)..." maxlength="1000"></textarea>
+                <button id="micButton" class="mic-button"><i class="fas fa-microphone"></i></button>
+                <div id="charCounter" class="char-counter">0/1000 caracteres</div>
+            </div>
+            
+            <div class="tone-selector">
+<div class="tone-header">
+  <label for="toneSelect" class="tone-label">En tono:</label>
+  <div class="tone-filter">
+    <label class="toggle-switch">
+      <input type="checkbox" id="favoritesToggle">
+      <span class="toggle-slider"></span>
+    </label>
+    <span class="toggle-label">⭐ Ver solo favoritos</span>
+  </div>
+</div>
+<div class="tone-select-container" style="position: relative;">
+  <select id="toneSelect">
+    <optgroup label="🧭 Cordial y educado">
+      <option value="amable">Amable</option>
+      <option value="respetuoso_firme">Respetuoso pero firme</option>
+      <option value="neutro_educado">Neutro pero educado</option>
+      <option value="amable_limites">Amable con límites</option>
+    </optgroup>
+    <optgroup label="😂 Divertido o con personalidad">
+      <option value="divertido_claro">Divertido pero claro</option>
+      <option value="sarcástico_fino">Sarcástico pero fino</option>
+      <option value="bien_mexicano">Bien mexicano</option>
+      <option value="tia_buena_vibra">Modo tía buena vibra</option>
+    </optgroup>
+    <optgroup label="🧊 Directos o serios">
+      <option value="directo_sin_rodeos">Directo sin rodeos</option>
+      <option value="molesto_estilo">Molesto pero con estilo</option>
+      <option value="claro_no_grosero">Clarito sin parecer grosero</option>
+      <option value="super_breve">Súper breve</option>
+    </optgroup>
+    <optgroup label="💌 Sentimental o emocional">
+      <option value="tierno_vulnerable">Tierno y vulnerable</option>
+      <option value="romantico_decente">Romántico pero decente</option>
+      <option value="poetico_emocional">Poético y emocional</option>
+      <option value="reflexivo">En plan reflexivo</option>
+    </optgroup>
+    <optgroup label="👨‍🎓 Formal o profesional">
+      <option value="formal_oficina">Formal de oficina</option>
+      <option value="politicamente_correcto">Políticamente correcto</option>
+    </optgroup>
+  </select>
+  <button id="favoriteStar" title="Marcar como favorito" style="position:absolute; right:30px; top:8px; background:none; border:none; font-size:1.2rem; cursor:pointer;">
+    <i class="far fa-star"></i>
+  </button>
+</div>
+                <p id="descripcion-tono" class="tone-description">
+  Cordial y considerado, perfecto para situaciones cotidianas.
+  <span id="example-icon" class="example-icon" title="Ver ejemplo">ℹ️</span>
+</p>
+<div id="example-box" class="example-box hidden"></div>
+
+<div class="collapsible-container">
+  <button type="button" class="collapsible-trigger">Ajuste de creatividad <i class="fas fa-chevron-down"></i></button>
+  <div class="collapsible-content">
+    <div class="temperature-control">
+      <label for="temperatureRange">Creatividad:</label>
+      <input type="range" id="temperatureRange" min="0" max="10" step="1" value="7">
+      <span id="temperatureValue">7</span>
+      <p class="temperature-tooltip">Más bajo = más formal y preciso, más alto = más creativo y libre.</p>
+    </div>
+  </div>
+</div>
+            </div>
+            
+            <button id="generateButton" class="generate-button">✨ Arréglalo ✨</button>
+
+<button id="clearButton" class="secondary-button" style="margin-top:10px;">
+  <i class="fas fa-trash"></i> Limpiar todo
+</button>
+            
+            <div id="loadingIndicator" class="loading-indicator hidden">
+                <div class="spinner"></div>
+                <p>Generando respuesta...</p>
+            </div>
+            
+<div id="resultContainer" class="result-container">
+    <p id="resultText">Respuesta aquí...</p>
+    <div class="gender-toggle">
+      <span class="gender-icon" data-gender="masculino">♂️</span>
+      <span class="gender-icon" data-gender="femenino">♀️</span>
+    </div>
+</div>
+
+<!-- Toast para copia automática, centrado en la ventana -->
+<div id="copyToast" class="copy-toast hidden">Respuesta copiada al portapapeles.</div>
+<p class="gender-tooltip">Cuando aplique, las respuestas se mostrarán según el género seleccionado.</p>
+            
+            <div class="action-buttons">
+                <button id="copyButton" class="action-button" title="Copiar al portapapeles"><i class="fas fa-copy"></i> Copiar</button>
+                <button id="whatsappButton" class="action-button" title="Enviar por WhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            </div>
+            
+            
+            <div class="social-share">
+                <p>¿Te gusta esta app?</p>
+                <div class="social-buttons">
+                    <!-- <a href="#" class="share-button"><i class="fas fa-share-alt"></i> ¡Compártela!</a> -->
+                    <a href="#" class="share-button" aria-label="Compartir esta app"><i class="fas fa-share-alt"></i> ¡Compártela!</a>
+                </div>
+            </div>
+        </main>
+        
+        
+    </div>
+
+    <!-- Contenedor para banner AdMob -->
+    <div id="admob-banner"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
