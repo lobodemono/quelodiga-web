@@ -1,6 +1,57 @@
 const { AdMob, BannerAdSize, BannerAdPosition, Clipboard } = window.Capacitor?.Plugins || {};
+let isAndroid = false;
+let clipboardInitialized = false;
+
+// Función para solicitar explícitamente permisos y activar el portapapeles
+async function initializeClipboard() {
+    if (clipboardInitialized) return;
+    
+    console.log('Inicializando el sistema de portapapeles...');
+    try {
+        if (Clipboard) {
+            // Simulamos una interacción con el portapapeles que activará permisos en Android
+            try {
+                console.log('Intentando primera lectura del portapapeles para activar permisos...');
+                await Clipboard.read();
+                console.log('Primera lectura del portapapeles exitosa');
+            } catch (e) {
+                console.error('Error en primera lectura:', e);
+            }
+            clipboardInitialized = true;
+        } else {
+            console.log('Plugin Clipboard no disponible');
+        }
+    } catch (err) {
+        console.error('Error inicializando clipboard:', err);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async function() {
+    // Detectar si es Android
+    isAndroid = window.Capacitor?.getPlatform() === 'android';
+    console.log('Plataforma detectada:', isAndroid ? 'Android' : 'No Android');
+    
+    // Crear un overlay transparente para capturar el primer toque
+    if (isAndroid) {
+        const touchOverlay = document.createElement('div');
+        touchOverlay.style.position = 'fixed';
+        touchOverlay.style.top = '0';
+        touchOverlay.style.left = '0';
+        touchOverlay.style.width = '100%';
+        touchOverlay.style.height = '100%';
+        touchOverlay.style.zIndex = '9999';
+        touchOverlay.style.backgroundColor = 'transparent';
+        
+        touchOverlay.addEventListener('click', async (e) => {
+            console.log('Primer toque detectado, activando portapapeles');
+            await initializeClipboard();
+            document.body.removeChild(touchOverlay);
+            setTimeout(checkClipboard, 200);
+            e.stopPropagation();
+        }, { once: true });
+        
+        document.body.appendChild(touchOverlay);
+    }
     if (AdMob && AdMob.initialize) {
         await AdMob.initialize({
             requestTrackingAuthorization: true,
@@ -31,24 +82,47 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     async function checkClipboard() {
         try {
+            console.log('Intentando leer el portapapeles...');
             let clipboardText = '';
 
             if (Clipboard && Clipboard.read) {
-                const { value } = await Clipboard.read();
-                clipboardText = value;
+                console.log('Usando plugin Clipboard...');
+                try {
+                    const result = await Clipboard.read();
+                    console.log('Resultado del plugin:', result);
+                    clipboardText = result.value;
+                    console.log('Texto obtenido:', clipboardText);
+                } catch (err) {
+                    console.error('Error del plugin Clipboard:', err);
+                }
             } else if (navigator.clipboard && navigator.clipboard.readText) {
+                console.log('Usando navigator.clipboard...');
                 clipboardText = await navigator.clipboard.readText();
+                console.log('Texto obtenido:', clipboardText);
             } else {
-                console.log('Clipboard API not available');
+                console.log('Ninguna API de portapapeles disponible');
                 return;
             }
 
-            if (!clipboardText || clipboardText.length > 1000) return;
-            if (originalMessage.value === clipboardText) return;
+            if (!clipboardText || clipboardText.length > 1000) {
+                console.log('Texto no válido o demasiado largo, o vacío');
+                return;
+            }
+            if (originalMessage.value === clipboardText) {
+                console.log('El texto ya está en el campo de mensaje');
+                return;
+            }
             const currentResponse = resultText.textContent.trim();
-            if (clipboardText.trim() === currentResponse) return;
-            if (rejectedClipboardTexts.includes(clipboardText)) return;
+            if (clipboardText.trim() === currentResponse) {
+                console.log('El texto es igual a la respuesta actual');
+                return;
+            }
+            if (rejectedClipboardTexts.includes(clipboardText)) {
+                console.log('El texto fue rechazado anteriormente');
+                return;
+            }
 
+            console.log('Mostrando toast con texto del portapapeles');
             const previewText = clipboardText.length > 60 ? clipboardText.substring(0, 57) + '...' : clipboardText;
             clipboardPreview.textContent = `"${previewText}"`;
             clipboardToast.classList.remove('hidden');
@@ -59,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
             }, 10000);
         } catch (error) {
-            console.error('Error reading clipboard:', error);
+            console.error('Error general en checkClipboard:', error);
         }
     }
 
@@ -73,7 +147,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     acceptClipboard.addEventListener('click', () => {
         hideClipboardToast();
-        navigator.clipboard.readText().then(text => {
+        (
+            Clipboard && Clipboard.read
+                ? Clipboard.read().then(({ value }) => value)
+                : navigator.clipboard.readText()
+        ).then(text => {
             originalMessage.value = text;
             const collapsibleTrigger = document.querySelector('.collapsible-trigger');
             const collapsibleContent = collapsibleTrigger.nextElementSibling;
@@ -88,7 +166,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     rejectClipboard.addEventListener('click', () => {
         hideClipboardToast();
-        navigator.clipboard.readText().then(text => {
+        (
+            Clipboard && Clipboard.read
+                ? Clipboard.read().then(({ value }) => value)
+                : navigator.clipboard.readText()
+        ).then(text => {
             if (!rejectedClipboardTexts.includes(text)) {
                 rejectedClipboardTexts.push(text);
                 if (rejectedClipboardTexts.length > 5) rejectedClipboardTexts.shift();
@@ -102,6 +184,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (document.visibilityState === 'visible') setTimeout(checkClipboard, 500);
     });
     window.addEventListener('focus', () => setTimeout(checkClipboard, 500));
+    
+    // Eventos adicionales para detectar interacción en Android 10+
+    document.addEventListener('click', () => setTimeout(checkClipboard, 100));
+    document.addEventListener('touchstart', () => setTimeout(checkClipboard, 100));
+    document.addEventListener('input', () => setTimeout(checkClipboard, 100));
 
     const tonoInfo = {
         amable: { descripcion: "Cordial, educado y considerado.", ejemplo: "¡Qué gusto saber de ti! Claro, me encantaría." },
