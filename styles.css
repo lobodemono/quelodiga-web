@@ -615,11 +615,6 @@ input[type="text"] {
     }
 }
 
-/* Espacio para banner AdMob fijo abajo */
-body {
-    padding-bottom: 60px;
-}
-
 /* Gender toggle styles */
 .gender-toggle {
     position: relative;
@@ -649,18 +644,17 @@ body {
 
 /* Colores para íconos de género */
 .gender-icon[data-gender="masculino"] {
-    color: #30D5C8 !important; /* aqua */
+    color: #30D5C8; /* aqua */
 }
 
 .gender-icon[data-gender="femenino"] {
-    color: #A020F0 !important; /* morado */
+    color: #E4007C; /* rosa mexicano */
 }
 
-/* Cuando está activo, solo aumentar opacidad y peso, sin cambiar color */
 .gender-icon.active {
     opacity: 1;
     font-weight: bold;
-    /* No cambiar color para mantener aqua o morado */
+    color: var(--primary-color);
 }
 
 .gender-tooltip {
@@ -748,12 +742,4 @@ body {
 
 .clipboard-toast.hiding {
     animation: fadeOut 0.3s forwards;
-}
-
-/* Ajuste tamaño select y opciones */
-select, option {
-    font-size: 1rem;
-    padding: 8px 12px;
-    height: auto;
-    line-height: 1.2;
 }
