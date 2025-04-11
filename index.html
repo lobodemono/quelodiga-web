@@ -142,15 +142,19 @@
             
 <div id="resultContainer" class="result-container">
     <p id="resultText">Respuesta aquí...</p>
-    <div class="gender-toggle">
-      <span class="gender-icon" data-gender="masculino">♂️</span>
-      <span class="gender-icon" data-gender="femenino">♀️</span>
-    </div>
+</div>
+
+<!-- Íconos de género y texto alineados en una sola fila -->
+<div class="gender-row">
+  <div class="gender-toggle">
+    <span class="gender-icon" data-gender="masculino">♂️</span>
+    <span class="gender-icon" data-gender="femenino">♀️</span>
+  </div>
+  <span class="gender-tooltip">Las respuestas se generan según el género seleccionado.</span>
 </div>
 
 <!-- Toast para copia automática, centrado en la ventana -->
 <div id="copyToast" class="copy-toast hidden">Respuesta copiada al portapapeles.</div>
-<p class="gender-tooltip">Las respuestas se generan según el género seleccionado.</p>
             
             <div class="action-buttons">
                 <button id="copyButton" class="action-button" title="Copiar al portapapeles"><i class="fas fa-copy"></i> Copiar</button>

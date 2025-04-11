@@ -627,12 +627,15 @@ input[type="text"] {
     position: relative;
 }
 
+/* Género: ahora fuera de la caja de respuesta */
 .gender-toggle {
-    position: absolute;
-    bottom: 5px;
-    left: 10px;
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 2px;
+    margin-bottom: 0;
+    position: static;
 }
 
 .gender-icon {
@@ -640,6 +643,21 @@ input[type="text"] {
     cursor: pointer;
     opacity: 0.5;
     transition: all 0.2s ease;
+    color: #30D5C8; /* aqua por defecto */
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0 2px;
+}
+
+.gender-icon[data-gender="femenino"] {
+    color: #E4007C; /* rosa mexicano */
+}
+
+.gender-icon.active {
+    opacity: 1;
+    font-weight: bold;
+    color: var(--primary-color);
 }
 
 /* Colores para íconos de género */
@@ -660,7 +678,7 @@ input[type="text"] {
 .gender-tooltip {
     font-size: 0.7rem;
     color: #888;
-    margin-top: -20px;
+    margin-top: 2px;
     margin-bottom: 15px;
     margin-left: 10px;
     text-align: left;
@@ -742,4 +760,29 @@ input[type="text"] {
 
 .clipboard-toast.hiding {
     animation: fadeOut 0.3s forwards;
+}
+
+/* Estilos para la fila de género */
+.gender-row {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre íconos y texto */
+  margin-top: -18px; /* Pegar más a la caja de respuesta */
+  margin-bottom: 15px; /* Espacio antes de botones */
+  padding-left: 2px; /* Pequeño margen izquierdo */
+}
+
+.gender-toggle {
+    display: flex;
+    gap: 0px; /* Reducir espacio entre íconos */
+    margin: 0;
+    position: static;
+}
+
+.gender-tooltip {
+    font-size: 0.7rem;
+    color: #888;
+    margin: 0 0 0 4px; /* Reducir margen izquierdo */
+    text-align: left;
+    white-space: nowrap;
 }
